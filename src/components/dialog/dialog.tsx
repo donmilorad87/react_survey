@@ -160,7 +160,7 @@ function Dialog() {
 
             if (!isInDialog) {
                 dialogRef.current.close();
-                console.log('smrca');
+    
 
             }
         }
@@ -201,10 +201,7 @@ function Dialog() {
     }
 
     const submitData = () => {
-        console.log(submitObject);
-
-
-
+        
         const raw = JSON.stringify(submitObject);
 
         const requestOptions: RequestInit = {
@@ -218,7 +215,7 @@ function Dialog() {
         fetch("https://blazingsun.space/checkoutChampRoute.php", requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result)
+            
                 setSubmitMessage('Thank you for taking this quiz!')
                 setTimeout(() => {
 

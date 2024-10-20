@@ -20,7 +20,7 @@ export default function Breadcrumbs(
       setFirstBreadcrumb('finished')
       setSecondBreadcrumb('active')
     }
-    console.log(step1Completed,'step1Completed');
+
     
   }, [step1Completed])
   useEffect(() => {
