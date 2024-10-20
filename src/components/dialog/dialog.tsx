@@ -107,7 +107,7 @@ function Dialog() {
 
                 dialogRef.current.showModal()
             }
-        }, 500);
+        }, 5000);
     }, [])
 
     useEffect(() => {
