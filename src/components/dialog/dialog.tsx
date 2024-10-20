@@ -3,11 +3,13 @@ import './dialog.scss'
 import Breadcrumbs from '../breadcrumbs/breadcrumbs';
 import Close from '../../assets/icons/close.svg'
 import Loader from '../loader/loader';
+import { v4 as uuidv4 } from 'uuid';
 export interface DialogProps {
     for_me: number
     for_me_answer: string
     for_a_friend: number
     for_a_friend_answer: number
+    UUID: string
 
 }
 
@@ -15,8 +17,12 @@ export interface SurveyState {
     step1: boolean
     step2: boolean
 }
+type UUID = string;
 
 function Dialog() {
+
+    const newUuid: UUID = uuidv4();
+
     const [isLoading, setIsLoading] = useState(false)
 
     const [submitMessage, setSubmitMessage] = useState<string | null>(null)
@@ -32,7 +38,7 @@ function Dialog() {
         height: window.innerHeight,
     });
 
-
+    
     useEffect(() => {
         // Function to update window size in state
         const handleResize = () => {
@@ -86,12 +92,13 @@ function Dialog() {
 
 
     }, [windowSize])
-   
+
     const [submitObject, setSubmitObject] = useState<DialogProps>({
         for_me: 0,
         for_me_answer: "",
         for_a_friend: 0,
-        for_a_friend_answer: 0
+        for_a_friend_answer: 0,
+        UUID: newUuid
     })
 
     const [step, setStep] = useState<number>(0)
@@ -107,7 +114,7 @@ function Dialog() {
 
                 dialogRef.current.showModal()
             }
-        }, 5000);
+        }, 500);
     }, [])
 
     useEffect(() => {
@@ -159,9 +166,10 @@ function Dialog() {
             );
 
             if (!isInDialog) {
-                dialogRef.current.close();
-    
-
+                //@ts-ignore
+                if (window.dataSubmiting !== true) {
+                    closeDialog()
+                }
             }
         }
 
@@ -178,10 +186,9 @@ function Dialog() {
             for_me: value === '1' ? 1 : 0,
             for_me_answer: "",
             for_a_friend: value === '1' ? 0 : 1,
-            for_a_friend_answer: 0
+            for_a_friend_answer: 0,
+            UUID: newUuid
         })
-
-
     }
 
     const handleSeccondStepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,9 +206,12 @@ function Dialog() {
             for_me_answer: value
         })
     }
-
-    const submitData = () => {
-        
+    const submitDataForm = () => {
+        submitData(true)
+    }
+    const submitData = (showModal: boolean) => {
+        //@ts-ignore
+        window.dataSubmiting = true
         const raw = JSON.stringify(submitObject);
 
         const requestOptions: RequestInit = {
@@ -211,52 +221,93 @@ function Dialog() {
 
             referrerPolicy: 'same-origin', // Referrer policy (optional)
         };
-        setIsLoading(true)
+        if (showModal) {
+            setIsLoading(true)
+        }
+
         fetch("https://blazingsun.space/checkoutChampRoute.php", requestOptions)
             .then((response) => {
-                console.log(response); 
+                console.log(response);
                 if (!response.ok) throw new Error('Error happened');
                 return response.text()
             })
             .then((result) => {
-            console.log(result);
-            
-                setSubmitMessage(result)
-                setTimeout(() => {
+                console.log(result);
+                 //@ts-ignore
+                window.dataSubmiting = true
+                if (showModal) {
+                    setSubmitMessage(result)
+                    setTimeout(() => {
 
-                    dialogRef.current?.close()
+                        dialogRef.current?.close()
 
-                }, 5000)
+                    }, 5000)
+                }
             })
             .catch((error) => {
                 console.error(error)
-                setSubmitMessage('error')
-                errorTextRef.current?.classList.remove('hide')
-                setTimeout(() => {
+                if (showModal) {
+                    setSubmitMessage('error')
+                    errorTextRef.current?.classList.remove('hide')
+                    setTimeout(() => {
 
-                    errorTextRef.current?.classList.add('hide')
+                        errorTextRef.current?.classList.add('hide')
 
-                }, 5000)
+                    }, 5000)
+                }
+
                 setSubmitObject({
                     for_me: 0,
                     for_me_answer: "",
                     for_a_friend: 0,
-                    for_a_friend_answer: 0
+                    for_a_friend_answer: 0,
+                    UUID: newUuid
                 })
                 setStep(0)
                 setStep1Completed(false)
+                //@ts-ignore
+                window.dataSubmiting = false
             })
             .finally(() => {
-
-                setIsLoading(false)
-
+                if (showModal) {
+                    setIsLoading(false)
+                }
+                
             })
 
     }
+
+    const closeDialog = () => {
+        dialogRef.current?.close()
+        //@ts-ignore
+        if (window.dataSubmiting !== true) {
+            submitData(false)
+        }
+
+    }
+    useEffect(() => {
+        // Handler function for keydown event
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                //@ts-ignore
+                if (window.dataSubmiting !== true) {
+                    submitData(false)
+                }
+            }
+        };
+
+        // Add event listener
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup function to remove the event listener
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
     return (
 
         <dialog id="myDialog" className="my-dialog" ref={dialogRef} onClick={closeOnBackdropClick}>
-            <img src={Close} alt="Close Dialog" onClick={() => dialogRef.current?.close()} className='closeDialog' />
+            <img src={Close} alt="Close Dialog" onClick={closeDialog} className='closeDialog' />
             <div>
                 {!isLoading && (submitMessage === null || submitMessage === 'error') && (
                     <>
@@ -265,9 +316,6 @@ function Dialog() {
                     </>
 
                 )}
-
-
-
 
                 <form method="dialog" className='surveyForm'>
                     {!isLoading && (submitMessage === null || submitMessage === 'error') && (
@@ -326,7 +374,6 @@ function Dialog() {
 
                     )}
 
-
                     {
                         isLoading &&
                         <Loader />
@@ -340,7 +387,7 @@ function Dialog() {
                     }
                     {
                         step === 1 && (submitMessage === null || submitMessage === 'error') &&
-                        <span role='button' className="button" onClick={submitData}>Submit</span>
+                        <span role='button' className="button" onClick={submitDataForm}>Submit</span>
                     }
 
                 </form>
