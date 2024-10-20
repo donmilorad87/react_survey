@@ -1,4 +1,10 @@
-*{
+.my-dialog {
   font-family: sans-serif;
   box-sizing: border-box;
+  label {
+    margin-bottom: 0;
+  }
+  * {
+    box-sizing: border-box;
+  }
 }

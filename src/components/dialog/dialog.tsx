@@ -261,7 +261,7 @@ function Dialog() {
                 {!isLoading && (submitMessage === null || submitMessage === 'error') && (
                     <>
                         <Breadcrumbs step1Completed={step1Completed} step={step} setStep={setStep} />
-                        <h1>Survey</h1>
+                        <h1 className='mainTitle'>Survey</h1>
                     </>
 
                 )}
