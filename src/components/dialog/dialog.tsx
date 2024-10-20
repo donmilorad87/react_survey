@@ -121,7 +121,7 @@ function Dialog() {
         if (submitObject.for_me === 1) {
             if (surveyStep1Ref.current && surveyStep2Ref.current) {
                 surveyStep1Ref.current.style.left = `-${surveyStep1Ref.current.offsetWidth}px`
-                surveyStep2Ref.current.style.left = `-${surveyStep2Ref.current.offsetWidth}px`
+                surveyStep2Ref.current.style.left = `-${surveyStep2Ref.current.offsetWidth-5}px`
             }
         } else if (submitObject.for_a_friend === 1) {
             if (surveyStep1Ref.current && surveyStep3Ref.current) {
@@ -142,7 +142,7 @@ function Dialog() {
             if (submitObject.for_me === 1) {
                 if (surveyStep1Ref.current && surveyStep2Ref.current) {
                     surveyStep1Ref.current.style.left = `-${surveyStep1Ref.current.offsetWidth}px`
-                    surveyStep2Ref.current.style.left = `-${surveyStep2Ref.current.offsetWidth}px`
+                    surveyStep2Ref.current.style.left = `-${surveyStep2Ref.current.offsetWidth-5}px`
                 }
             } else if (submitObject.for_a_friend === 1) {
                 if (surveyStep1Ref.current && surveyStep3Ref.current) {
