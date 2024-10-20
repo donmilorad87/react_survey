@@ -213,10 +213,15 @@ function Dialog() {
         };
         setIsLoading(true)
         fetch("https://blazingsun.space/checkoutChampRoute.php", requestOptions)
-            .then((response) => response.text())
+            .then((response) => {
+                console.log(response); 
+                if (!response.ok) throw new Error('Error happened');
+                return response.text()
+            })
             .then((result) => {
+            console.log(result);
             
-                setSubmitMessage('Thank you for taking this quiz!')
+                setSubmitMessage(result)
                 setTimeout(() => {
 
                     dialogRef.current?.close()
